@@ -1,12 +1,9 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-const pg = require("pg");
+import { AzureFunction, Context } from "@azure/functions";
+import client from "../databaseHelpers/connectionHelper";
+
 
 const httpTrigger: AzureFunction = async function (context: Context) {
-  const CONNECTION_STRING: string =
-    "postgres://qjwwomfs:ucRpniHOvmzcFBp5w1jXr5fp35v6l_Au@mel.db.elephantsql.com/qjwwomfs";
-  const query = 'SELECT * FROM "public"."cheesecake_ranking"';
-  const client = new pg.Client(CONNECTION_STRING);
-
+  const query = 'SELECT * FROM "cheesecake_ranking"';
   const connectionError = (err) => {
     if (err) {
       console.error("could not connect to postgres", err);
@@ -23,7 +20,7 @@ const httpTrigger: AzureFunction = async function (context: Context) {
 
   context.res = {
     // status: 200, /* Defaults to 200 */
-    body: result.rows[0],
+    body: (result.rows),
   };
 };
 
