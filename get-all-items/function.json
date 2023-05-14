@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/get-cheesecakes/index.js"
+  "scriptFile": "../dist/get-all-items/index.js"
 }

@@ -5,13 +5,8 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ) {
-  const { table, name, position, ubication, price, extra } = req.body;
-
-  const query = {
-    text: `INSERT INTO "${table}" (id, name, position, ubication, price, extra_info) VALUES (default, $1, $2, $3, $4, $5)`,
-    values: [name, position, ubication, price, extra],
-  };
-
+  const { table } = req.query;
+  const query = `SELECT * FROM "${table}"`;
   const connectionError = (err) => {
     if (err) {
       console.error("could not connect to postgres", err);
@@ -23,13 +18,11 @@ const httpTrigger: AzureFunction = async function (
   };
 
   await client.connect(connectionError);
-
   try {
     const result = await client.query(query);
     client.end();
-
     context.res = {
-      body: "Done",
+      body: result.rows,
     };
   } catch (error) {
     client.end();
