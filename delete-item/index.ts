@@ -2,17 +2,36 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import client from "../databaseHelpers/connectionHelper";
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    context.log('HTTP trigger function processed a request.');
-    const name = (req.query.name || (req.body && req.body.name));
-    const responseMessage = name
-        ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-        : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.";
+    const { table, name, position } = req.body;
 
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: responseMessage
+    const query = `DELETE FROM "${table}" WHERE name = "${name}" and position = "${position}"`
+
+    const connectionError = (err) => {
+      if (err) {
+        console.error("could not connect to postgres", err);
+        context.res = {
+          status: 500,
+          body: { error: err.message },
+        };
+      }
     };
 
+    await client.connect(connectionError);
+
+    try {
+      await client.query(query);
+      client.end();
+
+      context.res = {
+        body: "Done",
+      };
+    } catch (error) {
+      client.end();
+      context.res = {
+        status: 404,
+        body: { error: "Error in the query" },
+      };
+    }
 };
 
 export default httpTrigger;
