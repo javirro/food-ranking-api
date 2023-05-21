@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import client from "../databaseHelpers/connectionHelper";
+const pg = require("pg");
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -7,6 +7,7 @@ const httpTrigger: AzureFunction = async function (
 ) {
   const { table } = req.query;
   const query = `SELECT * FROM "${table}"`;
+
   const connectionError = (err) => {
     if (err) {
       console.error("could not connect to postgres", err);
@@ -16,7 +17,8 @@ const httpTrigger: AzureFunction = async function (
       };
     }
   };
-
+  const CONNECTION_STRING: string = process.env.CONNECTION_STRING;
+  const client = new pg.Client(CONNECTION_STRING);
   await client.connect(connectionError);
   try {
     const result = await client.query(query);
