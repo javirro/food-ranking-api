@@ -27,6 +27,7 @@ const httpTrigger: AzureFunction = async function (
       body: result.rows,
     };
   } catch (error) {
+    console.log(error)
     client.end();
     context.res = {
       status: 404,

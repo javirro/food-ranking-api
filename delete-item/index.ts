@@ -5,8 +5,8 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const { table, name, position } = req.body;
-  const query = `DELETE FROM "${table}" WHERE name = "${name}" and position = "${position}"`;
+  const { table, id } = req.query;
+  const query = `DELETE FROM "${table}" WHERE id = ${id}`;
 
 
   const connectionError = (err) => {
@@ -27,7 +27,7 @@ const httpTrigger: AzureFunction = async function (
     client.end();
 
     context.res = {
-      body: "Done",
+      body: JSON.stringify(`Deleted item with id: ${id}`),
     };
   } catch (error) {
     client.end();
