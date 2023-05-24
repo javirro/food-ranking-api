@@ -1,13 +1,13 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { DELETE_ITEM_AND_UPDATE_RANKING } from "../databaseHelpers/queries";
 const pg = require("pg");
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const { table, id } = req.query;
-  const query = `DELETE FROM "${table}" WHERE id = ${id}`;
-
+  const { table, id, position } = req.query;
+  const query = DELETE_ITEM_AND_UPDATE_RANKING(table, id, position)
 
   const connectionError = (err) => {
     if (err) {

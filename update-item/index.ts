@@ -1,23 +1,14 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import {UPDATE_POSITION_AND_INCREASE_LOWER_POSITIONS} from "../databaseHelpers/queries"
 const pg = require("pg");
+
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
   const { table, id, position } = req.query;
-  const query = `BEGIN;
-UPDATE ${table}
-SET position = ${position}
-WHERE id = ${id};
-
-UPDATE ${table}
-SET position = position + 1
-WHERE position >=  ${position}
-  AND id !=  ${id};
-
-COMMIT;
-}`;
+  const query = UPDATE_POSITION_AND_INCREASE_LOWER_POSITIONS(table,id, position)
 
   const connectionError = (err) => {
     if (err) {
