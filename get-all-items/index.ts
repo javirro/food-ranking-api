@@ -24,10 +24,15 @@ const httpTrigger: AzureFunction = async function (
     const result = await client.query(query);
     client.end();
     context.res = {
+      headers: {
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+      },
       body: result.rows,
     };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     client.end();
     context.res = {
       status: 404,
