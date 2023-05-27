@@ -1,6 +1,7 @@
-export const DELETE_ITEM_AND_UPDATE_RANKING = (table, deletedId, positionDeleted) =>
-  `DELETE FROM "${table}" WHERE id = ${deletedId}
-  UPDATE "${table}" SET position= position-1 WHERE position > ${positionDeleted}`
+
+
+export const DELETE_ITEM = (table, deletedId) =>  `DELETE FROM "${table}" WHERE id = ${deletedId}`
+export const UPDATE_AFTER_DELETE = (table, positionDeleted) =>  `UPDATE "${table}" SET position= position-1 WHERE position > ${positionDeleted}`
 
 export const UPDATE_POSITION_AND_INCREASE_LOWER_POSITIONS = (
     table,

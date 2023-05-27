@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { DELETE_ITEM_AND_UPDATE_RANKING } from "../databaseHelpers/queries";
+import { DELETE_ITEM, UPDATE_AFTER_DELETE } from "../databaseHelpers/queries";
 const pg = require("pg");
 
 const httpTrigger: AzureFunction = async function (
@@ -7,7 +7,7 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   const { table, id, position } = req.query;
-  const query = DELETE_ITEM_AND_UPDATE_RANKING(table, id, position)
+
 
   const connectionError = (err) => {
     if (err) {
@@ -23,7 +23,8 @@ const httpTrigger: AzureFunction = async function (
   await client.connect(connectionError);
 
   try {
-    await client.query(query);
+    await client.query(DELETE_ITEM(table,id));
+    await client.query(UPDATE_AFTER_DELETE(table, position))
     client.end();
 
     context.res = {
