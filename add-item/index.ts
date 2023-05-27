@@ -1,4 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { UPDATE_AFTER_ADD_ITEM } from "../databaseHelpers/queries";
 const pg = require("pg");
 
 const httpTrigger: AzureFunction = async function (
@@ -8,7 +9,7 @@ const httpTrigger: AzureFunction = async function (
   const { table, name, position, ubication, price, extra } = req.body;
 
   const query = {
-    text: `INSERT INTO "${table}" (id, name, position, ubication, price, extra_info) VALUES (default, $1, $2, $3, $4, $5)`,
+    text: `INSERT INTO "${table}" (id, name, position, ubication, price, extra_info) VALUES (default, $1, $2, $3, $4, $5) RETURNING id`,
     values: [name, position, ubication, price, extra],
   };
 
@@ -27,6 +28,8 @@ const httpTrigger: AzureFunction = async function (
 
   try {
     const result = await client.query(query);
+    const adddedId: number = result.rows[0].id
+    await client.query(UPDATE_AFTER_ADD_ITEM(table, position, adddedId))
     client.end();
 
     context.res = {
