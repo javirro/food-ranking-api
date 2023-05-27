@@ -6,7 +6,7 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ) {
   const { table } = req.query;
-  const query = `SELECT * FROM "${table} ORDER BY POSITION DESC"`;
+  const query = `SELECT * FROM "${table}" ORDER BY position DESC`;
 
   const connectionError = (err) => {
     if (err) {
