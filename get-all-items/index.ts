@@ -25,6 +25,7 @@ const httpTrigger: AzureFunction = async function (
     client.end();
     context.res = {
       headers: {
+        "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET",
       },
