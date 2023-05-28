@@ -33,7 +33,7 @@ const httpTrigger: AzureFunction = async function (
     client.end();
 
     context.res = {
-      body: "Done",
+      body: JSON.stringify("Done"),
     };
   } catch (error) {
     client.end();
