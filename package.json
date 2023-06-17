@@ -11,6 +11,7 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.0",
     "pg": "^8.10.0"
   },
   "devDependencies": {
