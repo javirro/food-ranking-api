@@ -1,9 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import { DELETE_ITEM, UPDATE_AFTER_DELETE } from "../databaseHelpers/queries";
 const pg = require("pg");
-import manageAuthorization, {
-  ManageAuthorizationRes,
-} from "../auth/jsonWebToken";
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -12,18 +9,6 @@ const httpTrigger: AzureFunction = async function (
   const { table, id, position } = req.query;
   const header = JSON.parse(req.headers["authorization"]);
   const tokenSecret = req.headers["token"];
-
-  let authData: ManageAuthorizationRes;
-
-  try {
-    authData = manageAuthorization(tokenSecret, header);
-  } catch (err) {
-    console.log("AUTH ERROR.", err.message);
-    context.res = {
-      status: 403,
-      body: { error: err.message },
-    };
-  }
 
   const connectionError = (err) => {
     if (err) {
@@ -44,7 +29,7 @@ const httpTrigger: AzureFunction = async function (
     client.end();
 
     context.res = {
-      body: JSON.stringify(authData.token),
+      body: JSON.stringify("authData.token"),
     };
   } catch (error) {
     client.end();

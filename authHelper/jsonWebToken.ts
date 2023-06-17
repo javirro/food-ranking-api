@@ -14,8 +14,8 @@ const verifyCallBack = (error, authorizedData) => {
   }
 };
 const manageAuthorization = (
-  tokenSecret: string,
-  authHeader: { user: string; password: string }
+   authHeader: { user: string; password: string },
+  tokenSecret?: string,
 ): ManageAuthorizationRes => {
   if (tokenSecret) {
     const data = jwt.verify(tokenSecret, process.env.SECRET, verifyCallBack);

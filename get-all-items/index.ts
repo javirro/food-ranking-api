@@ -13,6 +13,7 @@ const httpTrigger: AzureFunction = async function (
       console.error("could not connect to postgres", err);
       context.res = {
         status: 500,
+        
         body: { error: err.message },
       };
     }
@@ -25,9 +26,10 @@ const httpTrigger: AzureFunction = async function (
     client.end();
     context.res = {
       headers: {
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
+        // "Access-Control-Allow-Credentials": "true",
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Methods": "GET",
+        // 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token"
       },
       body: result.rows,
     };
