@@ -1,5 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 const pg = require("pg");
+require("dotenv").config()
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -13,23 +14,23 @@ const httpTrigger: AzureFunction = async function (
       console.error("could not connect to postgres", err);
       context.res = {
         status: 500,
-        
         body: { error: err.message },
       };
     }
   };
   const CONNECTION_STRING: string = process.env.CONNECTION_STRING;
-  const client = new pg.Client(CONNECTION_STRING);
+  console.log(CONNECTION_STRING)
+  const client = new pg.Client({ connectionString: CONNECTION_STRING });
   await client.connect(connectionError);
   try {
     const result = await client.query(query);
     client.end();
     context.res = {
       headers: {
-        // "Access-Control-Allow-Credentials": "true",
-        // "Access-Control-Allow-Origin": "*",
-        // "Access-Control-Allow-Methods": "GET",
-        // 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token"
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token"
       },
       body: result.rows,
     };

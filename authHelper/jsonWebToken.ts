@@ -22,9 +22,8 @@ const manageAuthorization = (
     return { token: tokenSecret, isAuthorized: true };
   } else {
     const [user, password] = authHeader.split[':'];
-    const usersEnabled = process.env.users;
 
-    if (usersEnabled.includes(user) && password === process.env.password) {
+    if (user === process.env.USERS && password === process.env.PASSWORD) {
       const token = jwt.sign(user, process.env.SECRET, { expiresIn: "1h" });
       return { token, isAuthorized: true };
     } else {
