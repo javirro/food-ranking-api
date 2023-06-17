@@ -14,14 +14,14 @@ const verifyCallBack = (error, authorizedData) => {
   }
 };
 const manageAuthorization = (
-   authHeader: { user: string; password: string },
+   authHeader: string,
   tokenSecret?: string,
 ): ManageAuthorizationRes => {
   if (tokenSecret) {
     const data = jwt.verify(tokenSecret, process.env.SECRET, verifyCallBack);
     return { token: tokenSecret, isAuthorized: true };
   } else {
-    const { user, password } = authHeader;
+    const [user, password] = authHeader.split[':'];
     const usersEnabled = process.env.users;
 
     if (usersEnabled.includes(user) && password === process.env.password) {
