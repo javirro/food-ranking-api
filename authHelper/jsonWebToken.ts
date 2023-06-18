@@ -18,7 +18,7 @@ const manageAuthorization = (
   tokenSecret?: string,
 ): ManageAuthorizationRes => {
   if (tokenSecret) {
-    const data = jwt.verify(tokenSecret, process.env.SECRET, verifyCallBack); // returns the original data used to generate the token
+    jwt.verify(tokenSecret, process.env.SECRET, verifyCallBack); // returns the original data used to generate the token
     return { token: tokenSecret, isAuthorized: true };
   } else {
     const [user, password] = authHeader.split(':');
