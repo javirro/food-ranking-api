@@ -19,7 +19,6 @@ const httpTrigger: AzureFunction = async function (
     }
   };
   const CONNECTION_STRING: string = process.env.CONNECTION_STRING;
-  console.log(CONNECTION_STRING)
   const client = new pg.Client({ connectionString: CONNECTION_STRING });
   await client.connect(connectionError);
   try {

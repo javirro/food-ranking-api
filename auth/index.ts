@@ -7,13 +7,13 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const header: any =req.headers["authorization"]
 
-  console.log("header", header)
+  const authHeader: string =req.headers["authorization"]
+  const token: string = req.headers["token"]
   let authData: ManageAuthorizationRes;
 
   try {
-    authData = manageAuthorization(header);
+    authData = manageAuthorization(authHeader, token);
   } catch (err) {
     console.log("AUTH ERROR.", err.message);
     context.res = {
@@ -24,9 +24,7 @@ const httpTrigger: AzureFunction = async function (
       body: { error: err.message },
     };
   }
-  console.log("AUTHDATA", authData.token);
   context.res = {
-    // status: 200, /* Defaults to 200 */
     headers: {
         'Access-Control-Allow-Origin': "*",
     },
