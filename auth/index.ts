@@ -9,11 +9,10 @@ const httpTrigger: AzureFunction = async function (
 ): Promise<void> {
 
   const authHeader: string =req.headers["authorization"]
-  const token: string = req.headers["token"]
   let authData: ManageAuthorizationRes;
 
   try {
-    authData = manageAuthorization(authHeader, token);
+    authData = manageAuthorization({ authHeader });
   } catch (err) {
     console.log("AUTH ERROR.", err.message);
     context.res = {
@@ -23,6 +22,7 @@ const httpTrigger: AzureFunction = async function (
       },
       body: { error: err.message },
     };
+    return
   }
   context.res = {
     headers: {

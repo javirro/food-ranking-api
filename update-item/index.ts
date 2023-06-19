@@ -1,5 +1,6 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import {UPDATE_AFTER_ADD_ITEM, UPDATE_POSITION } from "../databaseHelpers/queries"
+import manageAuthorization, { ManageAuthorizationRes } from "../authHelper/jsonWebToken";
 const pg = require("pg");
 
 
@@ -8,7 +9,23 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   const { table, id, position } = req.body;
+  const tokenSecret: string = req.headers["token"];
 
+  let authData: ManageAuthorizationRes;
+
+  try {
+    authData = manageAuthorization({ tokenSecret });
+  } catch (err) {
+    console.log("AUTH ERROR.", err.message);
+    context.res = {
+      status: 403,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: { error: err.message },
+    };
+    return
+  }
   const connectionError = (err) => {
     if (err) {
       console.error("could not connect to postgres", err);

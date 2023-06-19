@@ -13,7 +13,7 @@ const httpTrigger: AzureFunction = async function (
   let authData: ManageAuthorizationRes;
 
   try {
-    authData = manageAuthorization(undefined, tokenSecret);
+    authData = manageAuthorization({ tokenSecret });
   } catch (err) {
     console.log("AUTH ERROR.", err.message);
     context.res = {
@@ -23,6 +23,7 @@ const httpTrigger: AzureFunction = async function (
       },
       body: { error: err.message },
     };
+    return
   }
 
   const connectionError = (err) => {
