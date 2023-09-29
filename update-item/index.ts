@@ -8,7 +8,7 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const { table, id, position } = req.body;
+  const { table, id, position, name } = req.body;
   const tokenSecret: string = req.headers["token"];
 
   let authData: ManageAuthorizationRes;
@@ -24,7 +24,7 @@ const httpTrigger: AzureFunction = async function (
       },
       body: { error: err.message },
     };
-    return
+    return;
   }
   const connectionError = (err) => {
     if (err) {
@@ -40,7 +40,7 @@ const httpTrigger: AzureFunction = async function (
   await client.connect(connectionError);
 
   try {
-    await client.query(UPDATE_POSITION(table, position, id));
+    await client.query(UPDATE_POSITION(table, position, id, name));
     await client.query(UPDATE_AFTER_ADD_ITEM(table, id, position));
     client.end();
 
