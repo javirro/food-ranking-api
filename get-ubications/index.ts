@@ -84,7 +84,6 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     // Concat previous geo data with new one
     const allGeoData: GeoData[] = bdUbications.concat(citiesToAddToDb)
     client.end()
-    console.log("All geo Data", allGeoData)
     context.res = {
       headers: GET_HEADER,
       body: allGeoData.filter(data => data?.lon && data?.lat),
