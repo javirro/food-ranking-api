@@ -2,6 +2,7 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { GeoData, filterDuplicatedGeoData, getUbications } from "../helper/getUbications"
 import { GET_UBICATION, INSERT_UBICATION } from "../databaseHelpers/queries"
 import { GET_HEADER } from "../helper/getHeader"
+import { checkTableIsValid } from "../databaseHelpers/dbHelper"
 const pg = require("pg")
 require("dotenv").config()
 
@@ -22,6 +23,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   await client.connect(connectionError)
   let tableResult
   try {
+    if (!checkTableIsValid(table)) throw Error("Table name invalid. Avoid sql injection.")
     const query = `SELECT * FROM "${table}" ORDER BY position`
     tableResult = (await client.query(query)).rows
   } catch (error) {
@@ -77,7 +79,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
       try {
         await client.query(INSERT_UBICATION(citiesToAddToDb[i].name, citiesToAddToDb[i]?.lat, citiesToAddToDb[i]?.lon))
       } catch (e) {
-        console.log("Error adding to db", e.message)
+        console.error("Error adding ubications to db", e.message)
         continue
       }
     }
@@ -89,7 +91,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
       body: allGeoData.filter(data => data?.lon && data?.lat),
     }
   } catch (error) {
-    console.log("Error getting ubications. ", error.message)
+    console.error("Error getting ubications. ", error.message)
     client.end()
     context.res = {
       status: 404,

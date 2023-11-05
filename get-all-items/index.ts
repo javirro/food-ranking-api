@@ -1,46 +1,45 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-const pg = require("pg");
+import { checkTableIsValid } from "../databaseHelpers/dbHelper"
+const pg = require("pg")
 require("dotenv").config()
 
-const httpTrigger: AzureFunction = async function (
-  context: Context,
-  req: HttpRequest
-) {
-  const { table } = req.query;
-  const query = `SELECT * FROM "${table}" ORDER BY position`;
+const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest) {
+  const { table } = req.query
+  if (!checkTableIsValid(table)) throw Error("Table name invalid. Avoid sql injection.")
+  const query = `SELECT * FROM "${table}" ORDER BY position`
 
-  const connectionError = (err) => {
+  const connectionError = err => {
     if (err) {
-      console.error("could not connect to postgres", err);
+      console.error("could not connect to postgres", err)
       context.res = {
         status: 500,
         body: { error: err.message },
-      };
+      }
     }
-  };
-  const CONNECTION_STRING: string = process.env.CONNECTION_STRING;
-  const client = new pg.Client({ connectionString: CONNECTION_STRING });
-  await client.connect(connectionError);
+  }
+  const CONNECTION_STRING: string = process.env.CONNECTION_STRING
+  const client = new pg.Client({ connectionString: CONNECTION_STRING })
+  await client.connect(connectionError)
   try {
-    const result = await client.query(query);
-    client.end();
+    const result = await client.query(query)
+    client.end()
     context.res = {
       headers: {
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET",
-        'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token"
+        "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token",
       },
       body: result.rows,
-    };
+    }
   } catch (error) {
-    console.log(error);
-    client.end();
+    console.error("Error getting items.", error.message)
+    client.end()
     context.res = {
       status: 404,
       body: { error: "Error in the query" },
-    };
+    }
   }
-};
+}
 
 export default httpTrigger;
