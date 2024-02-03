@@ -37,7 +37,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
   try {
     await client.query(UPDATE_POSITION(table, position, id, name))
-    await client.query(UPDATE_AFTER_ADD_ITEM(table, id, position))
+    await client.query(UPDATE_AFTER_ADD_ITEM(table, position, id))
     client.end()
 
     context.res = {

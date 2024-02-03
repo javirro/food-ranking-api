@@ -24,7 +24,7 @@ export const UPDATE_AFTER_DELETE = (table: string, positionDeleted: number) => {
 export const UPDATE_POSITION = (table: string, position: number, id: number, name: string) => {
   if (!checkTableIsValid(table)) throw Error("Table name invalid. Avoid sql injection.")
   const query = {
-    text: `UPDATE ${table} SET position= $1, name = '$2' WHERE id = $3`,
+    text: `UPDATE ${table} SET position= $1, name = $2 WHERE id = $3`,
     values: [position, name, id],
   }
   return query
