@@ -22,6 +22,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   await client.connect(connectionError)
   try {
     const result = await client.query(query)
+    const data= result.rows
+    const dataPositionFixed = data.map((item, index) => ({...item, position: index + 1}))
     client.end()
     context.res = {
       headers: {
@@ -30,7 +32,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         "Access-Control-Allow-Methods": "GET",
         "Access-Control-Allow-Headers": "Origin, Content-Type, X-Auth-Token",
       },
-      body: result.rows,
+      body: dataPositionFixed,
     }
   } catch (error) {
     console.error("Error getting items.", error.message)
