@@ -4,7 +4,7 @@ import manageAuthorization, { ManageAuthorizationRes } from "../authHelper/jsonW
 const pg = require("pg")
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-  const { table, id, position } = req.body
+  const { table, id, position, name } = req.body
   const tokenSecret: string = req.headers["token"]
 
   let authData: ManageAuthorizationRes
@@ -36,51 +36,20 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   await client.connect(connectionError)
 
   try {
-    const res = await client.query(
-      `DO $$
-      DECLARE
-          target_id INTEGER := $1;
-          new_position INTEGER := $2;
-          old_position INTEGER;
-      BEGIN
-          SELECT position INTO old_position
-          FROM ${table}
-          WHERE id = target_id;
+    await client.query(UPDATE_POSITION(table, position, id, name))
+    await client.query(UPDATE_AFTER_ADD_ITEM(table, position, id))
+    client.end()
 
-          IF old_position IS NOT NULL THEN
-              IF new_position > old_position THEN
-                  UPDATE ${table}
-                  SET position = position - 1
-                  WHERE position > old_position AND position <= new_position;
-              ELSIF new_position < old_position THEN
-                  UPDATE ${table}
-                  SET position = position + 1
-                  WHERE position >= new_position AND position < old_position;
-              END IF;
-              
-              UPDATE ${table}
-              SET position = new_position
-              WHERE id = target_id;
-          END IF;
-      END $$;`,
-      [id, position]
-    )
-
-    await client.query("COMMIT")
-  } catch (err) {
-    await client.query("ROLLBACK")
+    context.res = {
+      body: JSON.stringify(`Updated item with id: ${id}`),
+    }
+  } catch (error) {
+    console.error("Error updating items.", error.message)
     client.end()
     context.res = {
       status: 404,
       body: { error: "Error in the query" },
     }
-    return
-  } finally {
-    client.release()
-  }
-
-  context.res = {
-    body: JSON.stringify(`Updated item with id: ${id}`),
   }
 }
 
