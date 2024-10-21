@@ -8,7 +8,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
   if (!checkTableIsValid(table)) throw Error("Table name invalid. Avoid sql injection.")
   const query = {
-    text: `INSERT INTO ${table} (id, name, position, ubication, price, extra_info) VALUES (default, $1, $2, $3, $4, $5) RETURNING id`,
+    text: `INSERT INTO ${table} (name, position, ubication, price, extra_info) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
     values: [name, position, ubication, price, extra],
   }
 
