@@ -39,7 +39,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     client.end()
     context.res = {
       status: 404,
-      body: { error: "Error in the query" },
+      body: { error: `Error in the query. ${error.message}`},
     }
   }
 }
