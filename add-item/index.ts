@@ -21,7 +21,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   const client = new pg.Client(CONNECTION_STRING)
   await client.connect(connectionError)
 
-  const nextId = await client.query(`SELECT NEXTVAL('${table}_id_seq')`)
+  const higherId = await client.query(`SELECT MAX(id) FROM ${table}`)
+  const nextId = higherId.rows[0].max + 1
   try {
     const query = {
       text: `INSERT INTO ${table} (id, name, position, ubication, price, extra_info) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
