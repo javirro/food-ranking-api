@@ -7,10 +7,6 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   const { table, name, position, ubication, price, extra } = req.body
 
   if (!checkTableIsValid(table)) throw Error("Table name invalid. Avoid sql injection.")
-  const query = {
-    text: `INSERT INTO ${table} (name, position, ubication, price, extra_info) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    values: [name, position, ubication, price, extra],
-  }
 
   const connectionError = err => {
     if (err) {
@@ -25,7 +21,13 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
   const client = new pg.Client(CONNECTION_STRING)
   await client.connect(connectionError)
 
+  const nextId = await client.query(`SELECT NEXTVAL('${table}_id_seq')`)
   try {
+    const query = {
+      text: `INSERT INTO ${table} (id, name, position, ubication, price, extra_info) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      values: [nextId, name, position, ubication, price, extra],
+    }
+
     const result = await client.query(query)
 
     const addedId: number = result.rows[0].id
@@ -39,7 +41,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     client.end()
     context.res = {
       status: 404,
-      body: { error: `Error in the query. ${error.message}`},
+      body: { error: `Error in the query.  Id: ${nextId} - ${error.message}` },
     }
   }
 }
